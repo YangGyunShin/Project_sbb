@@ -1,9 +1,11 @@
 package com.mysite.sbb.question;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.Banner;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -38,9 +40,11 @@ public class QuestionController {
     }
 
     @PostMapping("/create")
-    public String questionCreate(@RequestParam(value = "subject") String subject,
-                                 @RequestParam(value = "content") String content) {
-        this.questionService.create(subject, content);
+    // bindingresult : @valid 애너테이션으로 검증이 수행된 결과를 의미, 항상 @valid 매개변수 바로 뒤에 있어야 함.
+    public String questionCreate(@Valid QuestionForm questionForm, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            return "question_form";
+        } this.questionService.create(questionForm.getSubject(), questionForm.getContent());
         // 질문 저장 후 질문목록으로 이동
         return "redirect:/question/list";
     }
